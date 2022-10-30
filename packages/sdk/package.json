@@ -1,0 +1,16 @@
+{
+  "name": "lisk-sdk",
+  "version": "99.0.0",
+  "description": "",
+  "ascMain": "assembly/index.ts",
+  "main": "assembly/index.ts",
+  "types": "assembly/index.ts",
+  "scripts": {
+    "test": "node tests"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "assemblyscript": "^0.22.0"
+  }
+}
