@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests",
-    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:debug": "asc assembly/index.ts --target debug --transform lisk-sdk/dist/transform",
     "asbuild:release": "asc assembly/index.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     "start": "npx serve ."
@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "assemblyscript": "^0.22.0",
+    "assemblyscript": "^0.25.0",
     "lisk-sdk": "99.0.0"
   },
   "type": "module",

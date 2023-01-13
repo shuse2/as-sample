@@ -14,9 +14,6 @@
   "author": "",
   "license": "ISC",
   "workspaces": ["packages/*"],
-  "devDependencies": {
-    "assemblyscript": "^0.22.0"
-  },
   "type": "module",
   "exports": {
     ".": {
