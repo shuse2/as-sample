@@ -1,7 +1,8 @@
 // The entry file of your WebAssembly module.
 
-import { types, encoding, env } from "lisk-sdk/assembly";
+import { types, encoding, env, framework } from "lisk-sdk/assembly";
 import { verify as transfer_verify , execute as transfer_execute } from './commands/transfer';
+import { TokenModule } from './module';
 
 export function add(a: i32, b: i32): i32 {
   return a + b;
@@ -33,4 +34,12 @@ export function afterTransactionsExecute(): types.Status {
 export {
   transfer_verify,
   transfer_execute,
+}
+
+const tokenModule = new TokenModule();
+
+framework.app.register(tokenModule);
+
+export function execute(): void {
+	framework.app.execute();
 }

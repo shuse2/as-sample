@@ -4,6 +4,7 @@ import * as types from './types';
 import * as storage from './storage';
 import * as channel from './channel';
 import * as event from './event';
+import * as framework from './framework';
 
 export {
     env,
@@ -12,4 +13,5 @@ export {
     storage,
     channel,
     event,
+		framework,
 };
