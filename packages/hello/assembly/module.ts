@@ -1,15 +1,14 @@
 import { framework, types } from 'lisk-sdk/assembly';
+import {TransferEvent} from './events/transfer';
 import {AccountStore} from './stores/account';
 
-// @ts-ignore
-	@module
+@module
 export class TokenModule extends framework.Module {
 	public beforeTransactionsExecute(): void {
 		console.log('aaa');
 	}
 
-	// @ts-ignore
-	@command
+	@command()
 	public transfer(sender: types.Address, recipient: types.Address, tokenID: Uint8Array, amount: u64): void {
 		const store = new AccountStore();
 		const senderAccount = store.get(sender);
@@ -17,8 +16,7 @@ export class TokenModule extends framework.Module {
 		store.set(sender, senderAccount);
 	}
 
-	// @ts-ignore
-	@view
+	@view()
 	public getBalance(caller: types.Address, tokenID: Uint8Array): u64 {
 		return 0;
 	}

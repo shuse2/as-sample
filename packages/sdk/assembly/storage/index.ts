@@ -14,7 +14,8 @@ export class BaseStore<T extends EncodeDecoder> {
     get(key: Uint8Array): T {
         const val = env.storage.get(key);
         const i = instantiate<T>();
-        return i.decode<T>(val);
+				i.decode(val);
+        return i;
     }
 
     set(key: Uint8Array, value: T): void {
