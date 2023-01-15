@@ -1,9 +1,8 @@
 import { framework, types } from 'lisk-sdk/assembly';
-import {TransferEvent} from './events/transfer';
 import {AccountStore} from './stores/account';
 
 @module
-export class TokenModule extends framework.Module {
+export class NFTModule extends framework.Module {
 	public beforeTransactionsExecute(): void {
 		console.log('aaa');
 	}

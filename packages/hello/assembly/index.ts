@@ -1,11 +1,11 @@
 // The entry file of your WebAssembly module.
 
 import { framework } from "lisk-sdk/assembly";
-import { TokenModule } from './module';
+import { NFTModule } from './nft/module';
 
-const tokenModule = new TokenModule();
+const nftModule = new NFTModule();
 
-framework.app.register(tokenModule);
+framework.app.register(nftModule);
 
 export function execute(): void {
 	framework.app.execute();
