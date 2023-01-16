@@ -26,7 +26,7 @@ class Application {
 	}
 
 	public execute(): void {
-		const action: u32  = 2;
+		const action: u32  = 8;
 		
 		switch (action) {
 			// if action == 0 call init

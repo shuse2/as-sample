@@ -3,16 +3,13 @@ import {utils, ASTTransformVisitor, SimpleParser } from "visitor-as";
 import {createCodec} from "./codec.js";
 import { Metadata, ParsedData } from './types.js';
 import {containsDecorator} from "./utils.js";
+import fs from 'fs';
 
 const classDecorators = ['module', 'codec', 'event', 'store', 'asset'];
 
 class ModuleMembers extends ASTTransformVisitor {
 	parsedData: ParsedData | undefined;
-	metadata: Metadata = {
-		commands: [],
-		events: [],
-		stores: [],
-	};
+	metadata: Metadata[] = [];
 	
   visitFieldDeclaration(node: FieldDeclaration): void {
     const name = utils.getName(node);
@@ -66,6 +63,10 @@ class ModuleMembers extends ASTTransformVisitor {
 			methods: [],
 			fields: [],
 		};
+		// decide on the module name
+		const path = node.range.source.normalizedPath.split('/');
+		const modName = path[path.findIndex(p => p === 'assembly') + 1];
+
 		this.visit(node.members);
 		// if decorator contains codec, add codec methods
 		if (containsDecorator(this.parsedData.decorators, 'codec')) {
@@ -78,6 +79,9 @@ class ModuleMembers extends ASTTransformVisitor {
 		}
 		// if decorator contains method, add call methods
 		super.visitClassDeclaration(node);
+
+		this._parsedToMeta(this.parsedData, modName);
+
 		this.parsedData = undefined;
   }
 
@@ -88,7 +92,32 @@ class ModuleMembers extends ASTTransformVisitor {
 	afterParse(_: Parser): void {
     let sources = _.sources.filter(utils.not(utils.isStdlib));
     this.visit(sources);
+		fs.writeFileSync('./metadata.json', JSON.stringify(this.metadata));
   }
+
+	_parsedToMeta(parsed: ParsedData, mod: string): void {
+		const existingIndex = this.metadata.findIndex(m => m.name === mod);
+		const metadata = existingIndex > -1 ? this.metadata[existingIndex] : {
+			name: mod,
+			commands: [],
+			stores: [],
+			events: [],
+		};
+		if (containsDecorator(parsed.decorators, 'module')) {
+			const commands = parsed.methods.map(m => ({
+				name: m.name,
+				params: m.params.map((p, i) => ({
+					name: p.name,
+					type: p.type,
+					fieldNumber: i + 1,
+				})),
+				returnType: m.returnType,
+			}));
+			metadata.commands.push(...commands);
+		}	
+		const index = existingIndex > -1 ? existingIndex : this.metadata.length;
+		this.metadata[index] = metadata;
+	}
 }
 
 export default new ModuleMembers();

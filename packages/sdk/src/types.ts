@@ -1,8 +1,24 @@
 export interface Metadata {
-	commands: {};
-	stores: {};
-	events: {};
-}
+	name: string;
+	commands: {
+		name: string;
+		params: {
+			name: string;
+			type: string;
+			fieldNumber: number;
+		}[];
+		returnType: string;
+	}[];
+	stores: {
+		name: string;
+		params: {
+			name: string;
+			type: string;
+			fieldNumber: number;
+		};
+	}[];
+	events: {}[];
+};
 
 export interface Decorator {
 	name: string;

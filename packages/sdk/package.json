@@ -4,15 +4,19 @@
   "description": "",
   "ascMain": "assembly/index.ts",
   "main": "index.js",
-	"type": "module",
+  "type": "module",
   "types": "assembly/index.ts",
   "scripts": {
     "test": "node tests",
-		"build": "tsc"
+    "build": "tsc"
   },
+	"exports": {
+		"./transform": "./dist/transform.js"
+	},
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "assemblyscript": "^0.25.0",
     "typescript": "^4.9.4"
   },

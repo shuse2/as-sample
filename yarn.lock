@@ -2,9 +2,14 @@
 # yarn lockfile v1
 
 
+"@types/node@^18.11.18":
+  version "18.11.18"
+  resolved "https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz"
+  integrity sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==
+
 assemblyscript@^0.25.0:
   version "0.25.2"
-  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.25.2.tgz#49de9cac3d2657d6419f4214e33c3de6253daa83"
+  resolved "https://registry.npmjs.org/assemblyscript/-/assemblyscript-0.25.2.tgz"
   integrity sha512-67TQOMvKo23htvSK6lhOzsoQjnplNKkdwgq925uBvQZLDbg9pHfAWhg/R8i8tqKrtk6GH8haOJbQY4oNSQqehA==
   dependencies:
     binaryen "110.0.0-nightly.20221105"
@@ -12,32 +17,32 @@ assemblyscript@^0.25.0:
 
 binaryen@110.0.0-nightly.20221105:
   version "110.0.0-nightly.20221105"
-  resolved "https://registry.yarnpkg.com/binaryen/-/binaryen-110.0.0-nightly.20221105.tgz#9e3c47e8ffa31521acd125013dca3ceea143d0bf"
+  resolved "https://registry.npmjs.org/binaryen/-/binaryen-110.0.0-nightly.20221105.tgz"
   integrity sha512-OBESOc51q3SwgG8Uv8nMzGnSq7LJpSB/Fu8B3AjlZg6YtCEwRnlDWlnwNB6mdql+VdexfKmNcsrs4K7MYidmdQ==
 
 lodash.clonedeep@^4.5.0:
   version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+  resolved "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
   integrity sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==
 
 long@^5.2.0:
   version "5.2.1"
-  resolved "https://registry.yarnpkg.com/long/-/long-5.2.1.tgz#e27595d0083d103d2fa2c20c7699f8e0c92b897f"
+  resolved "https://registry.npmjs.org/long/-/long-5.2.1.tgz"
   integrity sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==
 
 ts-mixer@^6.0.2:
   version "6.0.2"
-  resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.2.tgz#3e4e4bb8daffb24435f6980b15204cb5b287e016"
+  resolved "https://registry.npmjs.org/ts-mixer/-/ts-mixer-6.0.2.tgz"
   integrity sha512-zvHx3VM83m2WYCE8XL99uaM7mFwYSkjR2OZti98fabHrwkjsCvgwChda5xctein3xGOyaQhtTeDq/1H/GNvF3A==
 
 typescript@^4.9.4:
   version "4.9.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.4.tgz#a2a3d2756c079abda241d75f149df9d561091e78"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.4.tgz"
   integrity sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==
 
 visitor-as@^0.11.4:
   version "0.11.4"
-  resolved "https://registry.yarnpkg.com/visitor-as/-/visitor-as-0.11.4.tgz#7b2d7b7ac8be86d4741796aa0630af5e471a4744"
+  resolved "https://registry.npmjs.org/visitor-as/-/visitor-as-0.11.4.tgz"
   integrity sha512-uih7AooY2V3LhzobjLqyEQzhYYBGeq0y/rZk295foM1Ko498f24NNXBDyM1SgzcLMFCAT/fpmSRco1BpTIdKNQ==
   dependencies:
     lodash.clonedeep "^4.5.0"
