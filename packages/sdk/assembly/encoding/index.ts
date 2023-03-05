@@ -1,20 +1,12 @@
-export interface Decoder {
-    decode(val: Uint8Array): void;
-}
+export { EncodeDecoder, Decoder, Encoder } from './codec';
 
-export interface Encoder {
-    encode(): Uint8Array;
-}
-
-export { EncodeDecoder } from './codec';
-
-export function u32ToBytesBE(num: u32): Uint8Array {
-    const result = new Uint8Array(4);
+export function u32ToBytesBE(num: u32): u8[] {
+    const result = new Array<u8>(4);
     return result;
 }
 
-export function u64ToBytesBE(num: u64): Uint8Array {
-    const result = new Uint8Array(4);
+export function u64ToBytesBE(num: u64): u8[] {
+    const result = new Array<u8>(4);
     return result;
 }
 

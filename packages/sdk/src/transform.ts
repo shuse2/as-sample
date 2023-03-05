@@ -11,20 +11,20 @@ class ModuleMembers extends ASTTransformVisitor {
 	parsedData: ParsedData | undefined;
 	metadata: Metadata[] = [];
 	
-  visitFieldDeclaration(node: FieldDeclaration): void {
-    const name = utils.getName(node);
-    const type = utils.getName(node.type!);
+	visitFieldDeclaration(node: FieldDeclaration): void {
+		const name = utils.getName(node);
+		const type = utils.getName(node.type!);
 		// val needs to be handled properly
 		const decorators = node.decorators?.map(d => ({
 			name: (d.name as any).text,
 			value: ((d.args?.[0] as any).value).toNumber() ?? '',
 		})) ?? [];
-		this.parsedData!.fields.push({
+		this.parsedData?.fields.push({
 			name,
 			type,
 			decorators,
 		});
-  }
+	}
 
 	visitMethodDeclaration(node: MethodDeclaration): void {
 		const name = utils.getName(node);

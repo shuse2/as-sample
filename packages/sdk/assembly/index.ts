@@ -1,17 +1,19 @@
 import * as encoding from './encoding';
 import * as env from './env';
-import * as types from './types';
+import * as types from './definitions';
+import * as bytes from './bytes';
 import * as storage from './storage';
 import * as channel from './channel';
-import * as event from './event';
+import * as events from './events';
 import * as framework from './framework';
 
 export {
     env,
     encoding,
     types,
+    bytes,
     storage,
     channel,
-    event,
+    events,
 		framework,
 };

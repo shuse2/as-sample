@@ -4,19 +4,23 @@
       "outFile": "build/debug.wasm",
       "textFile": "build/debug.wat",
       "sourceMap": true,
+			"runtime": "minimal",
+      "importMemory": true,
       "debug": true
     },
     "release": {
       "outFile": "build/release.wasm",
       "textFile": "build/release.wat",
       "sourceMap": true,
+			"runtime": "minimal",
       "optimizeLevel": 3,
       "shrinkLevel": 0,
+      "importMemory": true,
       "converge": false,
       "noAssert": false
     }
   },
   "options": {
-    "bindings": "esm"
+    "bindings": "raw"
   }
 }

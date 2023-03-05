@@ -13,7 +13,7 @@ export class Module {
 	public verifyTransaction(): void {}
 	public beforeCommandExecute(): void {}
 	public afterCommandExecute(): void {}
-	public call(_method: string, _params: Uint8Array): Uint8Array {
-		return new Uint8Array(0);
+	public call(_method: string, _params: u8[]): u8[] {
+		return [];
 	}
 }

@@ -14,7 +14,7 @@ class Application {
 		}
 	}
 
-	public call(module: string, command: string, params: Uint8Array): Uint8Array {
+	public call(module: string, command: string, params: u8[]): u8[] {
 		for (let i = 0; i < this._modules.length; i++) {	
 			const mod = this._modules[i];
 			if (mod.name != module) {
@@ -22,11 +22,15 @@ class Application {
 			}
 			return mod.call(command, params);
 		}
-		return new Uint8Array(0);
+		return [];
 	}
 
-	public execute(): void {
+	public execute(ptr_start: u32, data_len: u32): void {
+		const data = new Uint8Array(data_len);
+		memory.copy(data.dataStart, ptr_start, data_len);
 		const action: u32  = 8;
+
+		console.log(data.toString());
 		
 		switch (action) {
 			// if action == 0 call init
@@ -55,7 +59,7 @@ class Application {
 			case 8:
 				const module = '';
 				const method = '123';
-				const params = new Uint8Array(0);
+				const params: u8[] = [];
 				const result = this.call(module, method, params);
 				// set the result back to memory to be used
 				console.log(result.toString());

@@ -1,15 +1,29 @@
-import { types, encoding, env } from 'lisk-sdk/assembly';
+import { types, encoding, env, events } from 'lisk-sdk/assembly';
 
+@event
 @codec
-export class TransferEvent extends encoding.EncodeDecoder {
+export class TransferEvent extends events.BaseEvent {
+	@topic(1)
 	@fieldNumber(1)
-	senderAddress: types.Address = new Uint8Array(0);
+	senderAddress: types.Address;
 	@fieldNumber(2)
-	recipientAddress: types.Address = new Uint8Array(0);
+	@topic(2)
+	recipientAddress: types.Address;
 	@fieldNumber(3)
 	amount: u64 = 0;
+	@topic(3)
+	tokenID: u8[];
 
-	log(sender: types.Address): void {
-		env.event.log([sender], this.encode());
+	constructor(
+		senderAddress: types.Address,
+		recipientAddress: types.Address,
+		amount: u64,
+		tokenID: u8[],
+	) {
+		super();
+		this.senderAddress = senderAddress;
+		this.recipientAddress = recipientAddress;
+		this.amount = amount;
+		this.tokenID = tokenID;
 	}
 }

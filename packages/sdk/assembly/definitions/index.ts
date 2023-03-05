@@ -1,4 +1,4 @@
-export type Address = Uint8Array;
+export type Address = u8[];
 
 export const enum Status {
     Fail = 2,
