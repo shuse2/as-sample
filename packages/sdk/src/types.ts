@@ -1,28 +1,20 @@
+import { CodecMetadata } from "./codec.js";
+import { MethodMetadata } from "./command.js";
+import { EventMetadata } from "./event.js";
+import { StoreMetadata } from "./store.js";
+
 export interface Metadata {
 	name: string;
-	commands: {
-		name: string;
-		params: {
-			name: string;
-			type: string;
-			fieldNumber: number;
-		}[];
-		returnType: string;
-	}[];
-	stores: {
-		name: string;
-		params: {
-			name: string;
-			type: string;
-			fieldNumber: number;
-		};
-	}[];
-	events: {}[];
+	commands: MethodMetadata[];
+	endpoints: MethodMetadata[];
+	stores: StoreMetadata[];
+	events: EventMetadata[];
+	codec: CodecMetadata[];
 };
 
 export interface Decorator {
 	name: string;
-	value: number | string;
+	value: (number | string)[];
 }
 
 export interface Param {
@@ -43,8 +35,14 @@ export interface Field {
 	returnType: string;
 }
 
+export interface ExtendedClass {
+	class: string;
+	args: string[];
+}
+
 export interface ParsedData {
 	class: string;
+	extends: ExtendedClass | undefined;
 	decorators: Decorator[];
 	fields: Field[];
 	methods: Method[];

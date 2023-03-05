@@ -8,12 +8,12 @@ export class NFTModule extends framework.Module {
 	}
 
 	@command()
-	public transfer(sender: types.Address, recipient: types.Address, tokenID: u8[], amount: u64): void {
+	public transfer(context: framework.CommandContext, recipient: types.Address, tokenID: u8[], amount: u64): void {
 		const store = new AccountStore();
-		const senderAccount = store.get(sender);
+		const senderAccount = store.get(context.senderAddress);
 		senderAccount.balance -= amount;
-		store.set(sender, senderAccount);
-		new TransferEvent(sender, recipient, amount, tokenID).log();
+		store.set(context.senderAddress, senderAccount);
+		new TransferEvent(context.senderAddress, recipient, amount, tokenID).log();
 	}
 
 	@view()
@@ -25,22 +25,4 @@ export class NFTModule extends framework.Module {
 
 	public mint(caller: types.Address, tokenID: u8[], amount: u64): void {
 	}
-
-	// auto-generated
-	public call(method: string, params: u8[]): u8[] {
-		if (method == 'transfer') {
-			const reader = new encoding.Reader(params);
-			this.transfer(reader.readBytes(1), reader.readBytes(2), reader.readBytes(3), reader.readU64(4));
-			return [];
-		}
-		if (method == 'getBalance') {
-			const reader = new encoding.Reader(params);
-			const result = this.getBalance(reader.readBytes(1), reader.readBytes(2));
-			const writer = new encoding.Writer();
-			writer.writeU64(1, result);
-			return writer.result();
-		}
-		abort('method not registered');
-		return [];
-	}	
 }

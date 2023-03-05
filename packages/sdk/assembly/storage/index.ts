@@ -13,6 +13,11 @@ export class BaseStore<T extends EncodeDecoder> {
         return this._name;
     }
 
+    // this will be overwritten in extended class by compiler
+    key(): u8[] {
+        return [];
+    }
+
     get(key: u8[]): T {
 		const ptr = u32(heap.alloc(key.length));
         const keyPtrSize = env.storage.toPtrSize(ptr, key.length);

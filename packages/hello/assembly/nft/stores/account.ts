@@ -31,5 +31,5 @@ export class Account extends encoding.EncodeDecoder {
     infos: Info[] = [];
 }
 
-@store
+@store(1)
 export class AccountStore extends BaseStore<Account> {}

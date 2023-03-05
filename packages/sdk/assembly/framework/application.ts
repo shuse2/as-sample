@@ -20,7 +20,7 @@ class Application {
 			if (mod.name != module) {
 				continue;
 			}
-			return mod.call(command, params);
+			return mod.call({ senderAddress: [] }, command, params);
 		}
 		return [];
 	}

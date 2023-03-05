@@ -24,7 +24,7 @@ const getArrayType = (type: string) => {
 	return type.substring(start, end);
 };
 
-const getReader = (type: string, fieldNumber: number): string => {
+export const getReader = (type: string, fieldNumber: number): string => {
 	const convertedType = convertKnownType(type);
 	if (convertedType === 'u32') {
 		return `reader.readU32(${fieldNumber})`;
@@ -73,54 +73,54 @@ const getReader = (type: string, fieldNumber: number): string => {
 	}
 }
 
-const getWriter = (type: string, fieldNumber: number, name: string): string => {
+export const getWriter = (type: string, fieldNumber: number, name: string): string => {
 	const convertedType = convertKnownType(type);
 	if (convertedType === 'u32') {
-		return `writer.writeU32(${fieldNumber}, this.${name})`;
+		return `writer.writeU32(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<u32>') {
-		return `writer.writeU32s(${fieldNumber}, this.${name})`;
+		return `writer.writeU32s(${fieldNumber},${name})`;
 	}
 	if (convertedType === 'i32') {
-		return `writer.writeI32(${fieldNumber}, this.${name})`;
+		return `writer.writeI32(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<i32>') {
-		return `writer.writeI32s(${fieldNumber}, this.${name})`;
+		return `writer.writeI32s(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'u64') {
-		return `writer.writeU64(${fieldNumber}, this.${name})`;
+		return `writer.writeU64(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<u64>') {
-		return `writer.writeU64(${fieldNumber}, this.${name})`;
+		return `writer.writeU64(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'i64') {
-		return `writer.writeI64(${fieldNumber}, this.${name})`;
+		return `writer.writeI64(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<i64>') {
-		return `writer.writeI64s(${fieldNumber}, this.${name})`;
+		return `writer.writeI64s(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'bool') {
-		return `writer.writeBoolean(${fieldNumber}, this.${name})`;
+		return `writer.writeBoolean(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<bool>') {
-		return `writer.writeBooleans(${fieldNumber}, this.${name})`;
+		return `writer.writeBooleans(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'string') {
-		return `writer.writeString(${fieldNumber}, this.${name})`;
+		return `writer.writeString(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<string>') {
-		return `writer.writeStrings(${fieldNumber}, this.${name})`;
+		return `writer.writeStrings(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<u8>') {
-		return `writer.writeBytes(${fieldNumber}, this.${name})`;
+		return `writer.writeBytes(${fieldNumber}, ${name})`;
 	}
 	if (convertedType === 'Array<Array<u8>>') {
-		return `writer.writeBytesArray(${fieldNumber}, this.${name})`;
+		return `writer.writeBytesArray(${fieldNumber}, ${name})`;
 	}
 	if (convertedType.includes('Array')) {
-		return `for (let i = 0; i < this.${name}.length; i++) { writer.writeEncodable(${fieldNumber}, this.${name}[i]); }`;
+		return `for (let i = 0; i < ${name}.length; i++) { writer.writeEncodable(${fieldNumber}, ${name}[i]); }`;
 	} else {
-		return `writer.writeEncodable(${fieldNumber}, this.${name})`;
+		return `writer.writeEncodable(${fieldNumber}, ${name})`;
 	}
 };
 
@@ -129,13 +129,17 @@ const getFieldNumber = (decorators: Decorator[]): number => {
 	if (!d) {
 		throw new Error('no decorator found.');
 	}
-	if (typeof d.value !== 'number') {
+	if (d.value.length !== 1) {
+		throw new Error('Invalid field number input.');
+	}
+	const value = Number(d.value[0]);
+	if (typeof value !== 'number') {
 		throw new Error('invalid fieldNumber');
 	}
-	if (d.value <= 0) {
+	if (value <= 0) {
 		throw new Error('invalid fieldNumber');
 	}
-	return d.value;
+	return value;
 };
 
 export function createCodec(data: ParsedData): ({ encode: string; decode: string }) {
@@ -146,13 +150,13 @@ export function createCodec(data: ParsedData): ({ encode: string; decode: string
 	fields.sort((a, b) => {
 		const d1 = a.decorators.find(d => d.name === 'fieldNumber')!;
 		const d2 = b.decorators.find(d => d.name === 'fieldNumber')!;
-		return Number(d1.value) - Number(d2.value);
+		return Number(d1.value[0]) - Number(d2.value[0]);
 	});
 	let decode = `decode(val: u8[]): void { \nconst reader = new encoding.Reader(val);\n`;
 	let encode = 'encode(): u8[] { \nconst writer = new encoding.Writer();\n';
 	for (const field of fields) {
 		decode += `this.${field.name} = ${getReader(field.type, getFieldNumber(field.decorators))};\n`;
-		encode += `${getWriter(field.type, getFieldNumber(field.decorators), `${field.name}`)};\n`;
+		encode += `${getWriter(field.type, getFieldNumber(field.decorators), `this.${field.name}`)};\n`;
 	}
 	decode += 'reader.assertUnreadBytes(); }\n';
 	encode += 'return writer.result(); }\n';
@@ -162,3 +166,30 @@ export function createCodec(data: ParsedData): ({ encode: string; decode: string
 		decode,
 	};
 };
+
+export interface CodecMetadata {
+	name: string;
+	properties: {
+		name: string;
+		type: string;
+		fieldNumber: number;
+	}[];
+
+}
+
+export function getCodecMetadata(data: ParsedData): CodecMetadata {
+	const fields = data.fields.filter(d => containsDecorator(d.decorators, 'fieldNumber'));
+	fields.sort((a, b) => {
+		const d1 = a.decorators.find(d => d.name === 'fieldNumber')!;
+		const d2 = b.decorators.find(d => d.name === 'fieldNumber')!;
+		return Number(d1.value[0]) - Number(d2.value[0]);
+	});
+	return {
+		name: data.class,
+		properties: fields.map(f => ({
+			name: f.name,
+			type: f.type,
+			fieldNumber: getFieldNumber(f.decorators),
+		})),
+	};
+}

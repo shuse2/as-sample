@@ -1,2 +1,2 @@
 export { app } from './application';
-export { Module } from './module';
+export { Module, CommandContext } from './module';

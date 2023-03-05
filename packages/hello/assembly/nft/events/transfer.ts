@@ -1,6 +1,6 @@
 import { types, encoding, env, events } from 'lisk-sdk/assembly';
 
-@event
+@event('transfer')
 @codec
 export class TransferEvent extends events.BaseEvent {
 	@topic(1)
