@@ -1,7 +1,6 @@
 import * as env from "../env";
+import { pointer } from "../internal";
 import { EncodeDecoder } from '../encoding';
-
-const DEFAULT_SIZE = 1024 * 30;
 
 export class BaseStore<T extends EncodeDecoder> {
     _name: string = "";
@@ -19,17 +18,18 @@ export class BaseStore<T extends EncodeDecoder> {
     }
 
     get(key: u8[]): T {
-		const ptr = u32(heap.alloc(key.length));
-        const keyPtrSize = env.storage.toPtrSize(ptr, key.length);
+		const keyPtr = u32(heap.alloc(key.length));
+        const keyPtrSize = pointer.toPtrSize(keyPtr, key.length);
+        memory.copy(keyPtr, key.dataStart, key.length);
 
         const result = env.storage.get(keyPtrSize);
-        const valSize = env.storage.getSize(result)
-        const valPtr = env.storage.getPtr(result)
+        const valSize = pointer.getSize(result)
+        const valPtr = pointer.getPtr(result)
 
         const value = new Array<u8>(valSize);
         memory.copy(value.dataStart, valPtr, valSize);
 
-        heap.free(ptr);
+        heap.free(keyPtr);
         const i = instantiate<T>();
         if (valSize == 0) {
             return i;
@@ -42,10 +42,11 @@ export class BaseStore<T extends EncodeDecoder> {
         const valueBytes = value.encode();
 
         const keyPtr = u32(heap.alloc(key.length));
-        const keyPtrSize = env.storage.toPtrSize(keyPtr, key.length);
+        const keyPtrSize = pointer.toPtrSize(keyPtr, key.length);
         memory.copy(keyPtr, key.dataStart, key.length);
+
         const valuePtr = u32(heap.alloc(valueBytes.length));
-        const valuePtrSize = env.storage.toPtrSize(valuePtr, valueBytes.length);
+        const valuePtrSize = pointer.toPtrSize(valuePtr, valueBytes.length);
         memory.copy(valuePtr, valueBytes.dataStart, valueBytes.length);
 
         env.storage.set(keyPtrSize, valuePtrSize);
@@ -56,7 +57,7 @@ export class BaseStore<T extends EncodeDecoder> {
 
     del(key: u8[]): void {
         const keyPtr = heap.alloc(key.length);
-        const keyPtrSize = env.storage.toPtrSize(keyPtr, key.length);
+        const keyPtrSize = pointer.toPtrSize(keyPtr, key.length);
 
         env.storage.del(keyPtrSize);
 

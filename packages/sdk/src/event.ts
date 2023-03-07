@@ -54,7 +54,13 @@ export function createEvent(data: ParsedData, modName: string): { log: string, e
             event.name = '${names.eventName}';
             event.data = this.encode();
             event.topics = [${topics}];
-            env.event.log(event.encode());
+            const encodedEvent = event.encode();
+
+            const ptr = heap.alloc(encodedEvent.length);
+            const ptrSize: u64 = (u64(encodedEvent.length) << 32) + ptr;
+            memory.copy(ptr, encodedEvent.dataStart, encodedEvent.length);
+            env.event.log(ptrSize);
+            heap.free(ptr);
         }
     `;
     const errFunc = `
@@ -65,7 +71,12 @@ export function createEvent(data: ParsedData, modName: string): { log: string, e
             event.data = this.encode();
             event.topics = [${topics}];
             event.noRevert = true;
-            env.event.log(event.encode());
+
+            const ptr = heap.alloc(encodedEvent.length);
+            const ptrSize: u64 = (u64(encodedEvent.length) << 32) + ptr;
+            memory.copy(ptr, encodedEvent.dataStart, encodedEvent.length);
+            env.event.log(ptrSize);
+            heap.free(ptr);
         }
     `;
 

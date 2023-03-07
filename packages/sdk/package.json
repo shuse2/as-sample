@@ -11,7 +11,8 @@
     "build": "tsc"
   },
 	"exports": {
-		"./transform": "./dist/transform.js"
+		"./transform": "./dist/transform.js",
+		"./export": "./dist/export.js"
 	},
   "author": "",
   "license": "ISC",

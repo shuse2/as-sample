@@ -4,7 +4,11 @@ import {containsDecorator} from "./utils.js";
 const convertKnownType = (type: string): string => {
 	switch(type) {
 		case 'types.Address':
+		case 'types.ID':
 			return 'Array<u8>';
+		case 'framework.TransactionVerifyResult':
+		case 'framework.TransactionExecuteResult':
+			return 'i32';
 		default:
 			return type;
 	}

@@ -234,8 +234,7 @@ export class Reader {
 		if (size > u64(remaining)) {
 			abort('Invalid byte size');
 		}
-		const result = new Array<u8>(size);
-		this._data.copyWithin(i32(result.dataStart), this._index, this._index + size);
+		const result = this._data.slice(this._index, this._index + size);
 		this._index += size;
 
 		return result;

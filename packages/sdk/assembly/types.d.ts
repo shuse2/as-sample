@@ -8,3 +8,4 @@ declare function topic(_class: any): any;
 declare function event(eventName?: string, modName?: string): any;
 declare function view(): any;
 declare function command(): any;
+declare function constants(name?: string): any;

@@ -48,7 +48,7 @@ export class Writer {
 	}
 
 	writeBoolean(fieldNumber: u32, data: bool): void {
-		this._writeKey(wireType2, fieldNumber);
+		this._writeKey(wireType0, fieldNumber);
 		this._writeBool(data);
 	}
 

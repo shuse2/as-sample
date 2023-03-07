@@ -8,12 +8,13 @@ export class NFTModule extends framework.Module {
 	}
 
 	@command()
-	public transfer(context: framework.CommandContext, recipient: types.Address, tokenID: u8[], amount: u64): void {
+	public transfer(context: framework.CommandContext, recipient: types.Address, tokenID: u8[], amount: u64): framework.TransactionExecuteResult {
 		const store = new AccountStore();
 		const senderAccount = store.get(context.senderAddress);
 		senderAccount.balance -= amount;
 		store.set(context.senderAddress, senderAccount);
 		new TransferEvent(context.senderAddress, recipient, amount, tokenID).log();
+		return framework.TransactionExecuteResult.SUCCESS;
 	}
 
 	@view()

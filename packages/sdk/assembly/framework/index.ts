@@ -1,2 +1,2 @@
 export { app } from './application';
-export { Module, CommandContext } from './module';
+export { Module, CommandContext, TransactionExecuteResult, TransactionVerifyResult } from './module';

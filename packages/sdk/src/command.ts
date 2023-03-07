@@ -10,36 +10,53 @@ function createReader(params: Method['params']): string {
     `;
 }
 
-function createWriter(name: string, params: Method['params'], returnType: string): string {
+function createViewWriter(name: string, params: Method['params'], returnType: string): string {
     if (returnType === 'void') {
         return `
-            this.${name}(context, ${params.map((_, i) => `v${i}`).join(',')});
+            this.${name}(${params.map((_, i) => `v${i}`).join(',')});
             return [];
         `;
     }
     return `
         const writer = new encoding.Writer();
-        const result = this.${name}(context, ${params.map((_, i) => `v${i}`).join(',')});
+        const result = this.${name}(${params.map((_, i) => `v${i}`).join(',')});
         ${getWriter(returnType, 1, 'result')}
         return writer.result();
     `;
 }
 
-function createMethod(name: string, params: Method['params'], returnType: string): string {
+function createCommandWriter(name: string, params: Method['params']): string {
+    return `
+        const writer = new encoding.Writer();
+        const result = this.${name}(context, ${params.map((_, i) => `v${i}`).join(',')});
+        return result;
+    `;
+}
+
+function createCommandMethod(name: string, params: Method['params']): string {
     return `
     if (method == '${name}') {
         ${createReader(params)}
-        ${createWriter(name, params, returnType)}
+        ${createCommandWriter(name, params)}
+    }
+    `;
+}
+
+function createViewMethod(name: string, params: Method['params'], returnType: string): string {
+    return `
+    if (method == '${name}') {
+        ${createReader(params)}
+        ${createViewWriter(name, params, returnType)}
     }
     `;
 }
 
 export function createCommand(data: ParsedData): string {
     const callables = data.methods.filter(method => containsDecorator(method.decorators, 'command'));
-    let result = `public call(context: framework.CommandContext, method: string, params: u8[]): u8[] {\n`;
+    let result = `public call(context: framework.CommandContext, method: string, params: u8[]): framework.TransactionExecuteResult {\n`;
 
     if (callables.length === 0) {
-        result += `abort("unknown method: "+method); return [];\n }\n`;
+        result += `abort("unknown method: "+method); return -1;\n }\n`;
         return result;
     }
 
@@ -47,10 +64,13 @@ export function createCommand(data: ParsedData): string {
         if (callable.params.length === 0 || callable.params[0].type !== 'framework.CommandContext') {
             throw new Error('Invalid parameter for command. First parameter must be framework.CommandContext');
         }
-        result += createMethod(callable.name, callable.params.slice(1), callable.returnType);
+        if (callable.returnType !== 'framework.TransactionExecuteResult') {
+            throw new Error('Invalid return type for command. return type must be framework.TransactionExecuteResult');
+        }
+        result += createCommandMethod(callable.name, callable.params.slice(1));
     }
     result += ``;
-    result += `abort("unknown method: "+method); return [];\n }\n`;
+    result += `abort("unknown method: "+method); return -1;\n }\n`;
     return result;
 }
 
@@ -64,10 +84,11 @@ export function createView(data: ParsedData): string {
     }
 
     for (const callable of callables) {
-        result += createMethod(callable.name, callable.params, callable.returnType);
+        result += createViewMethod(callable.name, callable.params, callable.returnType);
     }
     result += ``;
     result += `abort("unknown method: "+method); return [];\n }\n`;
+    
     return result;
 }
 

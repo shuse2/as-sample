@@ -1,6 +1,5 @@
 import * as storage from './storage';
-import * as transaction from './transaction';
-import * as channel from './channel';
 import * as event from './event';
+import * as dev from './dev';
 
-export { storage, transaction, channel, event };
+export { storage, event, dev };
