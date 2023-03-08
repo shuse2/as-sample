@@ -1,4 +1,5 @@
 import * as types from "../type_def";
+import * as dev from '../dev';
 import { EncodeDecoder, readKey, readUInt } from "./codec";
 
 export class Reader {
@@ -17,7 +18,7 @@ export class Reader {
 		if (result.isErr()) {
 			return result.mapErr<u32>();
 		}
-		return types.Result.ok(u32(result.ok()));
+		return types.Result.ok(u32(result.unwrap()));
 	}
 
 	readU64(fieldNumber: u32): types.Result<u64> {
@@ -29,7 +30,7 @@ export class Reader {
 		if (result.isErr()) {
 			return result.mapErr<i32>();
 		}
-		return types.Result.ok(i32(result.ok()));
+		return types.Result.ok(i32(result.unwrap()));
 	}
 
 	readI64(fieldNumber: u32): types.Result<i64> {
@@ -67,14 +68,14 @@ export class Reader {
 			if (checkResult.isErr()) {
 				return checkResult.mapErr<u8[][]>();
 			}
-			if (!checkResult.ok()) {
+			if (!checkResult.unwrap()) {
 				return types.Result.ok(result);
 			}
 			const valResult = this._readBytes();
 			if (valResult.isErr()) {
 				return valResult.mapErr<u8[][]>();
 			}
-			result.push(valResult.ok());
+			result.push(valResult.unwrap());
 		}
 		return types.Result.ok(result);
 	}
@@ -84,21 +85,21 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<u32[]>();
 		}
-		if (!checkResult.ok()) {
+		if (!checkResult.unwrap()) {
 			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
 		if (arrayLength.isErr()) {
 			return arrayLength.mapErr<u32[]>();
 		}
-		const end = this._index + u32(arrayLength.ok());
+		const end = this._index + u32(arrayLength.unwrap());
 		const result = new Array<u32>();
 		while (this._index < end) {
 			const val = this._readUint();
 			if (val.isErr()) {
 				return val.mapErr<u32[]>();
 			}
-			result.push(u32(val.ok()));
+			result.push(u32(val.unwrap()));
 		}
 		return types.Result.ok(result);
 	}
@@ -108,21 +109,21 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<u64[]>();
 		}
-		if (!checkResult.ok()) {
+		if (!checkResult.unwrap()) {
 			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
 		if (arrayLength.isErr()) {
 			return arrayLength.mapErr<u64[]>();
 		}
-		const end = this._index + u32(arrayLength.ok());
+		const end = this._index + u32(arrayLength.unwrap());
 		const result = new Array<u64>();
 		while (this._index < end) {
 			const val = this._readUint();
 			if (val.isErr()) {
 				return val.mapErr<u64[]>();
 			}
-			result.push(val.ok());
+			result.push(val.unwrap());
 		}
 		return types.Result.ok(result);
 	}
@@ -132,21 +133,21 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<i32[]>();
 		}
-		if (!checkResult.ok()) {
+		if (!checkResult.unwrap()) {
 			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
 		if (arrayLength.isErr()) {
 			return arrayLength.mapErr<i32[]>();
 		}
-		const end = this._index + u32(arrayLength.ok());
+		const end = this._index + u32(arrayLength.unwrap());
 		const result = new Array<i32>();
 		while (this._index < end) {
 			const val = this._readInt();
 			if (val.isErr()) {
 				return val.mapErr<i32[]>();
 			}
-			result.push(i32(val.ok()));
+			result.push(i32(val.unwrap()));
 		}
 		return types.Result.ok(result);
 	}
@@ -156,7 +157,7 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<i64[]>();
 		}
-		const check = checkResult.ok();
+		const check = checkResult.unwrap();
 		if (!check) {
 			return types.Result.ok([]);
 		}
@@ -164,7 +165,7 @@ export class Reader {
 		if (arrayLengthResult.isErr()) {
 			return arrayLengthResult.mapErr<i64[]>();
 		}
-		const arrayLength = arrayLengthResult.ok();
+		const arrayLength = arrayLengthResult.unwrap();
 		const end = this._index + u32(arrayLength);
 		const result = new Array<i64>();
 		while (this._index < end) {
@@ -172,7 +173,7 @@ export class Reader {
 			if (valResult.isErr()) {
 				return valResult.mapErr<i64[]>();
 			}
-			result.push(valResult.ok());
+			result.push(valResult.unwrap());
 		}
 		return types.Result.ok(result);
 	}
@@ -184,7 +185,7 @@ export class Reader {
 			if (checkResult.isErr()) {
 				return checkResult.mapErr<string[]>();
 			}
-			const check = checkResult.ok();
+			const check = checkResult.unwrap();
 			if (!check) {
 				return types.Result.ok(result);
 			}
@@ -192,7 +193,7 @@ export class Reader {
 			if (val.isErr()) {
 				return val.mapErr<string[]>();
 			}
-			result.push(val.ok());
+			result.push(val.unwrap());
 		}
 		return types.Result.ok(result);
 	}
@@ -202,7 +203,7 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<bool[]>();
 		}
-		const check = checkResult.ok();
+		const check = checkResult.unwrap();
 		if (!check) {
 			return types.Result.ok([]);
 		}
@@ -210,14 +211,14 @@ export class Reader {
 		if (arrayLength.isErr()) {
 			return arrayLength.mapErr<bool[]>();
 		}
-		const end = this._index + u32(arrayLength.ok());
+		const end = this._index + u32(arrayLength.unwrap());
 		const result = new Array<bool>();
 		while (this._index < end) {
 			const val = this._readBool();
 			if (val.isErr()) {
 				return val.mapErr<bool[]>();
 			}
-			result.push(val.ok());
+			result.push(val.unwrap());
 		}
 		return types.Result.ok(result);
 	}
@@ -233,7 +234,7 @@ export class Reader {
 		}
 		const i = instantiate<T>();
 
-		i.decode(objectBytes.ok());
+		i.decode(objectBytes.unwrap());
 		return types.Result.ok(i);
 	}
 
@@ -244,7 +245,7 @@ export class Reader {
 			if (checkResult.isErr()) {
 				return types.Result.err<T[]>(checkResult.err());
 			}
-			const check = checkResult.ok();
+			const check = checkResult.unwrap();
 			if (!check) {
 				return types.Result.ok(result);
 			}
@@ -253,7 +254,7 @@ export class Reader {
 				return types.Result.err<T[]>(objectBytes.err());
 			}
 			const i = instantiate<T>();
-			i.decode(objectBytes.ok());
+			i.decode(objectBytes.unwrap());
 			result.push(i);
 		}
 		return types.Result.ok(result);
@@ -287,7 +288,7 @@ export class Reader {
 		if (checkResult.isErr()) {
 			return checkResult.mapErr<bool>();
 		}
-		const check = checkResult.ok();
+		const check = checkResult.unwrap();
 		if (!check) {
 			return types.Result.err<bool>('Invalid fieldNumber: ' + fieldNumber.toString());
 		}
@@ -302,12 +303,12 @@ export class Reader {
 		if (keyResult.isErr()) {
 			return keyResult.mapErr<bool>();
 		}
-		const key = keyResult.ok();
+		const key = keyResult.unwrap();
 		const nextFieldNumberResult = readKey(u32(key.value));
 		if (nextFieldNumberResult.isErr()) {
 			return nextFieldNumberResult.mapErr<bool>();
 		}
-		const nextFieldNumber = nextFieldNumberResult.ok();
+		const nextFieldNumber = nextFieldNumberResult.unwrap();
 		if (fieldNumber != nextFieldNumber.fieldNumber) {
 			return types.Result.ok(false);
 		}
@@ -320,8 +321,8 @@ export class Reader {
 		if (result.isErr()) {
 			return result.mapErr<u64>();
 		}
-		this._index += result.ok().size;
-		return types.Result.ok(result.ok().value);
+		this._index += result.unwrap().size;
+		return types.Result.ok(result.unwrap().value);
 	}
 
 	private _readInt(): types.Result<i64> {
@@ -329,7 +330,7 @@ export class Reader {
 		if (result.isErr()) {
 			return result.mapErr<i64>();
 		}
-		const value = result.ok();
+		const value = result.unwrap();
 		if (value % 2 == 0) {
 			return types.Result.ok(i64(value) / 2);
 		}
@@ -351,7 +352,7 @@ export class Reader {
 		if (sizeResult.isErr()) {
 			return sizeResult.mapErr<u8[]>();
 		}
-		const size = u32(sizeResult.ok());
+		const size = u32(sizeResult.unwrap());
 		const remaining = this._end - this._index;
 		if (size > u64(remaining)) {
 			return types.Result.err<u8[]>('Invalid byte size');
@@ -367,7 +368,7 @@ export class Reader {
 		if (rawBytesResult.isErr()) {
 			return rawBytesResult.mapErr<string>();
 		}
-		const rawBytes = rawBytesResult.ok();
+		const rawBytes = rawBytesResult.unwrap();
 		const typedBytes = new Uint8Array(rawBytes.length);
 		typedBytes.set(rawBytes);
 

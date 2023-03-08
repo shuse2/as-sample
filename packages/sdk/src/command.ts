@@ -17,7 +17,7 @@ function createViewWriter(name: string, params: Method['params'], returnType: st
         if (result.isErr()) {
             return types.Result.err<u8[]>(result.err());
         }
-        const value = result.ok();
+        const value = result.unwrap();
         ${getWriter(internalType, 1, 'value')}
         return types.Result.ok(writer.result());
         `;
@@ -44,15 +44,15 @@ function createCommandMethod(name: string, params: Method['params']): string {
     if (method == '${name}') {
         const reader = new encoding.Reader(params);
         ${params.map((param, i)=> `
-            const v${i}Result = ${getReader(param.type, i)};
+            const v${i}Result = ${getReader(param.type, i + 1)};
             if (v${i}Result.isErr()) {
-                return framework.TransactionExecuteResult.INVALID;
+                return framework.TransactionExecuteResult.FAIL;
             }
-            const v${i} = v${i}Result.ok();
+            const v${i} = v${i}Result.unwrap();
         `).join('')}
         const unreadBytes = reader.assertUnreadBytes();
         if (unreadBytes.isErr()) {
-            return framework.TransactionExecuteResult.INVALID;
+            return framework.TransactionExecuteResult.FAIL;
         }
         ${createCommandWriter(name, params)}
     }
@@ -64,11 +64,11 @@ function createViewMethod(name: string, params: Method['params'], returnType: st
     if (method == '${name}') {
         const reader = new encoding.Reader(params);
         ${params.map((param, i)=> `
-            const v${i}Result = ${getReader(param.type, i)};
+            const v${i}Result = ${getReader(param.type, i + 1)};
             if (v${i}Result.isErr()) {
                 return v${i}Result.mapErr<u8[]>();
             }
-            const v${i} = v${i}Result.ok();
+            const v${i} = v${i}Result.unwrap();
         `).join('')}
         const unreadBytes = reader.assertUnreadBytes();
         if (unreadBytes.isErr()) {

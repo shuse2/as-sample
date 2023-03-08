@@ -10,7 +10,6 @@ export enum TransactionVerifyResult {
 }
 
 export enum TransactionExecuteResult {
-	INVALID = i32(-1),
 	FAIL = i32(0),
 	SUCCESS = i32(1),
 }
@@ -25,17 +24,17 @@ export class Module {
         return this._name;
     }
 	public init(): void {}
-	public verifyAsset(): void {}
+	public verifyAsset(): types.MaybeError { return types.MaybeError.ok(); }
 	public insertAsset(): void {}
-	public beforeTransactionsExecute(): void {}
-	public afterTransactionsExecute(): void {}
+	public beforeTransactionsExecute(): types.MaybeError { return types.MaybeError.ok(); }
+	public afterTransactionsExecute(): types.MaybeError { return types.MaybeError.ok(); }
 	public verifyTransaction(): TransactionVerifyResult { return TransactionVerifyResult.SUCCESS }
-	public beforeCommandExecute(): void {}
-	public afterCommandExecute(): void {}
+	public beforeCommandExecute(): types.MaybeError { return types.MaybeError.ok(); }
+	public afterCommandExecute(): types.MaybeError { return types.MaybeError.ok(); }
 
 	// call should be extended by compiler taking the 'command' decorator
 	public call(_context: CommandContext, _method: string, _params: u8[]): TransactionExecuteResult {
-		return TransactionExecuteResult.INVALID;
+		return TransactionExecuteResult.FAIL;
 	}
 	// view should be extended by compiler taking the 'view' decorator
 	public view(_method: string, _params: u8[]): types.Result<u8[]> {

@@ -152,7 +152,7 @@ export function createCodec(data: ParsedData): ({ encode: string; decode: string
 			if (readResult.isErr()) {
 				return readResult.mapErr<bool>();
 			}
-			this.${field.name} = readResult.ok();
+			this.${field.name} = readResult.unwrap();
 		}
 		`;
 		encode += `${getWriter(field.type, getFieldNumber(field.decorators), `this.${field.name}`)};\n`;

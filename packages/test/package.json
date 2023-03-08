@@ -1,0 +1,17 @@
+{
+  "name": "aslisk-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "start": "npx serve ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@liskhq/lisk-codec": "0.2.2"
+  },
+  "type": "module"
+}

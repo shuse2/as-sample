@@ -30,3 +30,34 @@ export class Event extends encoding.EncodeDecoder {
 	@fieldNumber(5)
 	noRevert: bool = false;
 }
+
+@codec
+export class CommandResult extends encoding.EncodeDecoder {
+	@fieldNumber(1)
+	success: bool = false;
+}
+
+
+@codec
+export class CommandResultEvent extends encoding.EncodeDecoder {
+	@fieldNumber(1)
+	module: string = '';
+	@fieldNumber(2)
+	name: string = '';
+	@fieldNumber(3)
+	topics: u8[][] = [];
+	@fieldNumber(4)
+	data: CommandResult = new CommandResult();
+	@fieldNumber(5)
+	noRevert: bool = true;
+
+	static new(module: string, name: string, success: bool): u8[] {
+		const result = new CommandResult();
+		result.success = success;
+		const event = new CommandResultEvent();
+		event.module = module;
+		event.name = name;
+		event.data = result;
+		return event.encode();
+	}
+}
