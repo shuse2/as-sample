@@ -29,7 +29,7 @@ export class Module {
 	public insertAsset(): void {}
 	public beforeTransactionsExecute(): void {}
 	public afterTransactionsExecute(): void {}
-	public verifyTransaction(): TransactionVerifyResult { return TransactionVerifyResult.INVALID }
+	public verifyTransaction(): TransactionVerifyResult { return TransactionVerifyResult.SUCCESS }
 	public beforeCommandExecute(): void {}
 	public afterCommandExecute(): void {}
 

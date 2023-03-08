@@ -18,10 +18,10 @@ export class NFTModule extends framework.Module {
 	}
 
 	@view()
-	public getBalance(caller: types.Address, tokenID: u8[]): u64 {
+	public getBalance(caller: types.Address, tokenID: u8[]): types.Result<u64> {
 		const store = new AccountStore();
 		const senderAccount = store.get(caller);
-		return 0;
+		return types.Result.ok<u64>(0);
 	}
 
 	public mint(caller: types.Address, tokenID: u8[], amount: u64): void {

@@ -1,6 +1,6 @@
 import { getReader, getWriter } from "./codec.js";
 import { Method, ParsedData } from "./types.js";
-import { containsDecorator } from "./utils.js";
+import { containsDecorator, getGenericType } from "./utils.js";
 
 function createViewWriter(name: string, params: Method['params'], returnType: string): string {
     if (returnType === 'void') {
@@ -8,6 +8,20 @@ function createViewWriter(name: string, params: Method['params'], returnType: st
             this.${name}(${params.map((_, i) => `v${i}`).join(',')});
             return types.Result.ok([]);
         `;
+    }
+    if (returnType.includes('types.Result')) {
+        const internalType = getGenericType(returnType);
+        return `
+        const writer = new encoding.Writer();
+        const result = this.${name}(${params.map((_, i) => `v${i}`).join(',')});
+        if (result.isErr()) {
+            return types.Result.err<u8[]>(result.err());
+        }
+        const value = result.ok();
+        ${getWriter(internalType, 1, 'value')}
+        return types.Result.ok(writer.result());
+        `;
+
     }
     return `
         const writer = new encoding.Writer();

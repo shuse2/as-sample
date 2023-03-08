@@ -1,5 +1,5 @@
 import {Decorator, ParsedData} from "./types.js";
-import {containsDecorator} from "./utils.js";
+import {containsDecorator, getGenericType} from "./utils.js";
 
 const convertKnownType = (type: string): string => {
 	switch(type) {
@@ -12,20 +12,6 @@ const convertKnownType = (type: string): string => {
 		default:
 			return type;
 	}
-};
-
-const getArrayType = (type: string) => {
-	let start = 0;
-	let end = type.length - 1;
-	for (let i = 0; i < type.length; i++) {
-		if (start === 0 && type.at(i) === '<') {
-			start = i + 1;
-		}
-		if (end === type.length - 1 && type.at(end - i) === '>') {
-			end = type.length - 1 - i;
-		}
-	}
-	return type.substring(start, end);
 };
 
 export const getReader = (type: string, fieldNumber: number): string => {
@@ -70,7 +56,7 @@ export const getReader = (type: string, fieldNumber: number): string => {
 		return `reader.readBytesArray(${fieldNumber})`;
 	}
 	if (convertedType.includes('Array')) {
-		const objType = getArrayType(convertedType);
+		const objType = getGenericType(convertedType);
 		return `reader.readDecodables<${objType}>(${fieldNumber})`;
 	} else {
 		return `reader.readDecodable<${convertedType}>(${fieldNumber})`;
