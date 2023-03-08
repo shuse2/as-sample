@@ -1,5 +1,7 @@
 import * as env from "../env";
 import * as encoding from '../encoding';
+import * as types from "../type_def";
+import * as internal from "../internal";
 
 export class BaseEvent extends encoding.EncodeDecoder {
 	topics(): u8[][] {
@@ -7,11 +9,11 @@ export class BaseEvent extends encoding.EncodeDecoder {
 	}
 
 	log(): void {
-		env.event.log([])
+		env.event.log(internal.pointer.toZeroPtr(0))
 	}
 
 	error(): void {
-		env.event.log([])
+		env.event.log(internal.pointer.toZeroPtr(0))
 	}
 }
 

@@ -1,5 +1,4 @@
-import { encoding } from "lisk-sdk/assembly";
-import { BaseStore } from "lisk-sdk/assembly/storage";
+import { encoding, storage, types } from "lisk-sdk/assembly";
 
 @codec
 export class Vote extends encoding.EncodeDecoder {
@@ -32,4 +31,4 @@ export class Account extends encoding.EncodeDecoder {
 }
 
 @store(1)
-export class AccountStore extends BaseStore<Account> {}
+export class AccountStore extends storage.BaseStore<Account> {}

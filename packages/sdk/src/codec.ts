@@ -156,13 +156,22 @@ export function createCodec(data: ParsedData): ({ encode: string; decode: string
 		const d2 = b.decorators.find(d => d.name === 'fieldNumber')!;
 		return Number(d1.value[0]) - Number(d2.value[0]);
 	});
-	let decode = `decode(val: u8[]): void { \nconst reader = new encoding.Reader(val);\n`;
+	let decode = `decode(val: u8[]): types.Result<bool> { \nconst reader = new encoding.Reader(val);\n`;
 	let encode = 'encode(): u8[] { \nconst writer = new encoding.Writer();\n';
 	for (const field of fields) {
-		decode += `this.${field.name} = ${getReader(field.type, getFieldNumber(field.decorators))};\n`;
+		// decode += `this.${field.name} = ${getReader(field.type, getFieldNumber(field.decorators))};\n`;
+		decode += `
+		{
+			const readResult = ${getReader(field.type, getFieldNumber(field.decorators))};
+			if (readResult.isErr()) {
+				return readResult.mapErr<bool>();
+			}
+			this.${field.name} = readResult.ok();
+		}
+		`;
 		encode += `${getWriter(field.type, getFieldNumber(field.decorators), `this.${field.name}`)};\n`;
 	}
-	decode += 'reader.assertUnreadBytes(); }\n';
+	decode += 'return reader.assertUnreadBytes(); }\n';
 	encode += 'return writer.result(); }\n';
 	decode += '}';
 	return {

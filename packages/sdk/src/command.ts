@@ -2,26 +2,18 @@ import { getReader, getWriter } from "./codec.js";
 import { Method, ParsedData } from "./types.js";
 import { containsDecorator } from "./utils.js";
 
-function createReader(params: Method['params']): string {
-    return `
-        const reader = new encoding.Reader(params);
-        ${params.map((param, i)=> `const v${i} = ${getReader(param.type, i)};\n`).join('')}
-        reader.assertUnreadBytes();
-    `;
-}
-
 function createViewWriter(name: string, params: Method['params'], returnType: string): string {
     if (returnType === 'void') {
         return `
             this.${name}(${params.map((_, i) => `v${i}`).join(',')});
-            return [];
+            return types.Result.ok([]);
         `;
     }
     return `
         const writer = new encoding.Writer();
         const result = this.${name}(${params.map((_, i) => `v${i}`).join(',')});
         ${getWriter(returnType, 1, 'result')}
-        return writer.result();
+        return types.Result.ok(writer.result());
     `;
 }
 
@@ -36,7 +28,18 @@ function createCommandWriter(name: string, params: Method['params']): string {
 function createCommandMethod(name: string, params: Method['params']): string {
     return `
     if (method == '${name}') {
-        ${createReader(params)}
+        const reader = new encoding.Reader(params);
+        ${params.map((param, i)=> `
+            const v${i}Result = ${getReader(param.type, i)};
+            if (v${i}Result.isErr()) {
+                return framework.TransactionExecuteResult.INVALID;
+            }
+            const v${i} = v${i}Result.ok();
+        `).join('')}
+        const unreadBytes = reader.assertUnreadBytes();
+        if (unreadBytes.isErr()) {
+            return framework.TransactionExecuteResult.INVALID;
+        }
         ${createCommandWriter(name, params)}
     }
     `;
@@ -45,7 +48,18 @@ function createCommandMethod(name: string, params: Method['params']): string {
 function createViewMethod(name: string, params: Method['params'], returnType: string): string {
     return `
     if (method == '${name}') {
-        ${createReader(params)}
+        const reader = new encoding.Reader(params);
+        ${params.map((param, i)=> `
+            const v${i}Result = ${getReader(param.type, i)};
+            if (v${i}Result.isErr()) {
+                return v${i}Result.mapErr<u8[]>();
+            }
+            const v${i} = v${i}Result.ok();
+        `).join('')}
+        const unreadBytes = reader.assertUnreadBytes();
+        if (unreadBytes.isErr()) {
+            return unreadBytes.mapErr<u8[]>();
+        }
         ${createViewWriter(name, params, returnType)}
     }
     `;
@@ -76,10 +90,10 @@ export function createCommand(data: ParsedData): string {
 
 export function createView(data: ParsedData): string {
     const callables = data.methods.filter(method => containsDecorator(method.decorators, 'view'));
-    let result = `public view(method: string, params: u8[]): u8[] {\n`;
+    let result = `public view(method: string, params: u8[]): types.Result<u8[]> {\n`;
 
     if (callables.length === 0) {
-        result += `abort("unknown method: "+method); return [];\n }\n`;
+        result += `return types.Result<u8[]>.err("unknown method: "+method);\n }\n`;
         return result;
     }
 
@@ -87,8 +101,8 @@ export function createView(data: ParsedData): string {
         result += createViewMethod(callable.name, callable.params, callable.returnType);
     }
     result += ``;
-    result += `abort("unknown method: "+method); return [];\n }\n`;
-    
+    result += `return types.Result.err<u8[]>("unknown method: "+method);\n };\n`;
+
     return result;
 }
 

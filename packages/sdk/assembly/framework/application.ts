@@ -1,3 +1,5 @@
+import * as dev from '../dev';
+import * as types from '../type_def';
 import * as encoding from '../encoding';
 import { pointer } from '../internal';
 import { ExecuteAction, VersionActionResult, ViewAction } from './actions';
@@ -157,10 +159,13 @@ class Application {
 		for (let i = 0; i < this._modules.length; i++) {
 			if (this._modules[i].name == action.module) {
 				 const result = this._modules[i].view(action.method, action.params);
-				 return this._writeResult(result, outputPtrSize);
+				 if (result.isErr()) {
+					dev.abort('handle this error properly');
+				 }
+				 return this._writeResult(result.ok(), outputPtrSize);
 			}
 		}
-		abort('Invalid input. module does not exist.')
+		dev.abort('Invalid input. module does not exist.')
 		return pointer.toZeroPtr(outputPtrSize);
 	}
 

@@ -1,3 +1,4 @@
+import * as types from "../type_def";
 import { EncodeDecoder, readKey, readUInt } from "./codec";
 
 export class Reader {
@@ -11,240 +12,365 @@ export class Reader {
 		this._end = data.length;
 	}
 
-	public readU32(fieldNumber: u32): u32 {
+	public readU32(fieldNumber: u32): types.Result<u32> {
 		const result = this._checkAndReadUint64(fieldNumber);
-		return u32(result);
+		if (result.isErr()) {
+			return result.mapErr<u32>();
+		}
+		return types.Result.ok(u32(result.ok()));
 	}
 
-	readU64(fieldNumber: u32): u64 {
+	readU64(fieldNumber: u32): types.Result<u64> {
 		return this._checkAndReadUint64(fieldNumber);
 	}
 
-	readI32(fieldNumber: u32): i32 {
+	readI32(fieldNumber: u32): types.Result<i32> {
 		const result = this._checkAndReadInt64(fieldNumber);
-		return i32(result);
+		if (result.isErr()) {
+			return result.mapErr<i32>();
+		}
+		return types.Result.ok(i32(result.ok()));
 	}
 
-	readI64(fieldNumber: u32): i64 {
+	readI64(fieldNumber: u32): types.Result<i64> {
 		return this._checkAndReadInt64(fieldNumber);
 	}
 
-	readBytes(fieldNumber: u32): u8[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			abort('Invalid fieldNumber: ' + fieldNumber.toString());
+	readBytes(fieldNumber: u32): types.Result<u8[]> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<u8[]>();
 		}
 		return this._readBytes();
 	}
 
-	readString(fieldNumber: u32): string {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			abort('Invalid fieldNumber: ' + fieldNumber.toString());
+	readString(fieldNumber: u32): types.Result<string> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<string>();
 		}
 		return this._readString();
 	}
 
-	readBoolean(fieldNumber: u32): bool {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			abort('Invalid fieldNumber: ' + fieldNumber.toString());
+	readBoolean(fieldNumber: u32): types.Result<bool> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<bool>();
 		}
 		return this._readBool();
 	}
 
-	readBytesArray(fieldNumber: u32): u8[][] {
+	readBytesArray(fieldNumber: u32): types.Result<u8[][]> {
 		const result = new Array<u8[]>();
 		while (this._index < this._end) {
-			if (!this._checkFieldNumber(fieldNumber)) {
-				return result;
+			const checkResult = this._checkFieldNumber(fieldNumber);
+			if (checkResult.isErr()) {
+				return checkResult.mapErr<u8[][]>();
 			}
-			const val = this._readBytes();
-			result.push(val);
+			if (!checkResult.ok()) {
+				return types.Result.ok(result);
+			}
+			const valResult = this._readBytes();
+			if (valResult.isErr()) {
+				return valResult.mapErr<u8[][]>();
+			}
+			result.push(valResult.ok());
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readU32s(fieldNumber: u32): u32[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			return [];
+	readU32s(fieldNumber: u32): types.Result<u32[]> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<u32[]>();
+		}
+		if (!checkResult.ok()) {
+			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
-		const end = this._index + u32(arrayLength);
+		if (arrayLength.isErr()) {
+			return arrayLength.mapErr<u32[]>();
+		}
+		const end = this._index + u32(arrayLength.ok());
 		const result = new Array<u32>();
 		while (this._index < end) {
 			const val = this._readUint();
-			result.push(u32(val));
+			if (val.isErr()) {
+				return val.mapErr<u32[]>();
+			}
+			result.push(u32(val.ok()));
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readU64s(fieldNumber: u32): u64[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			return [];
+	readU64s(fieldNumber: u32): types.Result<u64[]> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<u64[]>();
+		}
+		if (!checkResult.ok()) {
+			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
-		const end = this._index + u32(arrayLength);
+		if (arrayLength.isErr()) {
+			return arrayLength.mapErr<u64[]>();
+		}
+		const end = this._index + u32(arrayLength.ok());
 		const result = new Array<u64>();
 		while (this._index < end) {
 			const val = this._readUint();
-			result.push(val);
+			if (val.isErr()) {
+				return val.mapErr<u64[]>();
+			}
+			result.push(val.ok());
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readI32s(fieldNumber: u32): i32[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			return [];
+	readI32s(fieldNumber: u32): types.Result<i32[]> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<i32[]>();
+		}
+		if (!checkResult.ok()) {
+			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
-		const end = this._index + u32(arrayLength);
+		if (arrayLength.isErr()) {
+			return arrayLength.mapErr<i32[]>();
+		}
+		const end = this._index + u32(arrayLength.ok());
 		const result = new Array<i32>();
 		while (this._index < end) {
 			const val = this._readInt();
-			result.push(i32(val));
+			if (val.isErr()) {
+				return val.mapErr<i32[]>();
+			}
+			result.push(i32(val.ok()));
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readI64s(fieldNumber: u32): i64[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			return [];
+	readI64s(fieldNumber: u32): types.Result<i64[]> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<i64[]>();
 		}
-		const arrayLength = this._readUint();
+		const check = checkResult.ok();
+		if (!check) {
+			return types.Result.ok([]);
+		}
+		const arrayLengthResult = this._readUint();
+		if (arrayLengthResult.isErr()) {
+			return arrayLengthResult.mapErr<i64[]>();
+		}
+		const arrayLength = arrayLengthResult.ok();
 		const end = this._index + u32(arrayLength);
-		const result = new Array<i32>();
+		const result = new Array<i64>();
 		while (this._index < end) {
-			const val = this._readInt();
-			result.push(val);
+			const valResult = this._readInt();
+			if (valResult.isErr()) {
+				return valResult.mapErr<i64[]>();
+			}
+			result.push(valResult.ok());
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readStrings(fieldNumber: u32): string[] {
+	readStrings(fieldNumber: u32): types.Result<string[]> {
 		const result = new Array<string>();
 		while (this._index < this._end) {
-			if (!this._checkFieldNumber(fieldNumber)) {
-				return result;
+			const checkResult = this._checkFieldNumber(fieldNumber);
+			if (checkResult.isErr()) {
+				return checkResult.mapErr<string[]>();
+			}
+			const check = checkResult.ok();
+			if (!check) {
+				return types.Result.ok(result);
 			}
 			const val = this._readString();
-			result.push(val);
+			if (val.isErr()) {
+				return val.mapErr<string[]>();
+			}
+			result.push(val.ok());
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readBooleans(fieldNumber: u32): bool[] {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			return [];
+	readBooleans(fieldNumber: u32): types.Result<bool[]> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<bool[]>();
+		}
+		const check = checkResult.ok();
+		if (!check) {
+			return types.Result.ok([]);
 		}
 		const arrayLength = this._readUint();
-		const end = this._index + u32(arrayLength);
+		if (arrayLength.isErr()) {
+			return arrayLength.mapErr<bool[]>();
+		}
+		const end = this._index + u32(arrayLength.ok());
 		const result = new Array<bool>();
 		while (this._index < end) {
 			const val = this._readBool();
-			result.push(val);
+			if (val.isErr()) {
+				return val.mapErr<bool[]>();
+			}
+			result.push(val.ok());
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	readDecodable<T extends EncodeDecoder>(fieldNumber: u32): T {
-		if (!this._checkFieldNumber(fieldNumber)) {
-			abort('Invalid fieldNumber: ' + fieldNumber.toString());
+	readDecodable<T extends EncodeDecoder>(fieldNumber: u32): types.Result<T> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return types.Result.err<T>(checkResult.err());
 		}
 		const objectBytes = this._readBytes();
+		if (objectBytes.isErr()) {
+			return types.Result.err<T>(objectBytes.err());
+		}
 		const i = instantiate<T>();
 
-		i.decode(objectBytes);
-		return i;
+		i.decode(objectBytes.ok());
+		return types.Result.ok(i);
 	}
 
-	readDecodables<T extends EncodeDecoder>(fieldNumber: u32): T[] {
+	readDecodables<T extends EncodeDecoder>(fieldNumber: u32): types.Result<T[]> {
 		const result = new Array<T>();
 		while (this._index < this._end) {
-			if (!this._checkFieldNumber(fieldNumber)) {
-				return result;
+			const checkResult = this._checkFieldNumber(fieldNumber);
+			if (checkResult.isErr()) {
+				return types.Result.err<T[]>(checkResult.err());
+			}
+			const check = checkResult.ok();
+			if (!check) {
+				return types.Result.ok(result);
 			}
 			const objectBytes = this._readBytes();
+			if (objectBytes.isErr()) {
+				return types.Result.err<T[]>(objectBytes.err());
+			}
 			const i = instantiate<T>();
-			i.decode(objectBytes);
+			i.decode(objectBytes.ok());
 			result.push(i);
 		}
-		return result;
+		return types.Result.ok(result);
 	}
 
-	assertUnreadBytes(): void {
+	assertUnreadBytes(): types.Result<bool> {
 		if (this._index != this._end) {
-			abort('Invalid input. there are remaining unread bytes.');
+			return types.Result.err<bool>('Invalid input. there are remaining unread bytes.');
 		}
+		return types.Result.ok(true);
 	}
 
-	private _checkAndReadInt64(fieldNumber: u32): i64 {
-		const ok = this._checkFieldNumber(fieldNumber);
-		if (!ok) {
-			abort('Invalid field number');
+	private _checkAndReadInt64(fieldNumber: u32): types.Result<i64> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<i64>();
 		}
 		return this._readInt();
 	}
 
-	private _checkAndReadUint64(fieldNumber: u32): u64 {
-		const ok = this._checkFieldNumber(fieldNumber);
-		if (!ok) {
-			abort('Invalid field number');
+	private _checkAndReadUint64(fieldNumber: u32): types.Result<u64> {
+		const checkResult = this._checkStrictFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<u64>();
 		}
 		return this._readUint();
 	}
 
-	private _checkFieldNumber(fieldNumber: u32): bool {
-		if (this._index >= this._end) {
-			return false;
+	private _checkStrictFieldNumber(fieldNumber: u32): types.Result<bool> {
+		const checkResult = this._checkFieldNumber(fieldNumber);
+		if (checkResult.isErr()) {
+			return checkResult.mapErr<bool>();
 		}
-		const key = readUInt(this._data, this._index);
-		const nextFieldNumber = readKey(u32(key.value));
+		const check = checkResult.ok();
+		if (!check) {
+			return types.Result.err<bool>('Invalid fieldNumber: ' + fieldNumber.toString());
+		}
+		return checkResult;
+	}
+
+	private _checkFieldNumber(fieldNumber: u32): types.Result<bool> {
+		if (this._index >= this._end) {
+			return types.Result.ok(false);
+		}
+		const keyResult = readUInt(this._data, this._index);
+		if (keyResult.isErr()) {
+			return keyResult.mapErr<bool>();
+		}
+		const key = keyResult.ok();
+		const nextFieldNumberResult = readKey(u32(key.value));
+		if (nextFieldNumberResult.isErr()) {
+			return nextFieldNumberResult.mapErr<bool>();
+		}
+		const nextFieldNumber = nextFieldNumberResult.ok();
 		if (fieldNumber != nextFieldNumber.fieldNumber) {
-			return false;
+			return types.Result.ok(false);
 		}
 		this._index += key.size;
-		return true;
+		return types.Result.ok(true);
 	}
 
-	private _readUint(): u64 {
+	private _readUint(): types.Result<u64> {
 		const result = readUInt(this._data, this._index);
-		this._index += result.size;
-		return result.value;
-	}
-
-	private _readInt(): i64 {
-		const result = this._readUint();
-		if (result % 2 == 0) {
-			return i64(result) / 2;
+		if (result.isErr()) {
+			return result.mapErr<u64>();
 		}
-		return -1 * i64((result + 1) / 2);
+		this._index += result.ok().size;
+		return types.Result.ok(result.ok().value);
 	}
 
-	private _readBool(): bool {
+	private _readInt(): types.Result<i64> {
+		const result = this._readUint();
+		if (result.isErr()) {
+			return result.mapErr<i64>();
+		}
+		const value = result.ok();
+		if (value % 2 == 0) {
+			return types.Result.ok(i64(value) / 2);
+		}
+		return types.Result.ok(-1 * i64((value + 1) / 2));
+	}
+
+	private _readBool(): types.Result<bool> {
 		const target = this._data[this._index];
 		if (target != 0 && target != 1) {
-			abort('Invalid binary data');
+			return types.Result.err<bool>('Invalid binary data');
 		}
 		const result = target != 0;
 		this._index++;
-		return result
+		return types.Result.ok(result)
 	}
 
-	private _readBytes(): u8[] {
-		const size = u32(this._readUint());
+	private _readBytes(): types.Result<u8[]> {
+		const sizeResult = this._readUint();
+		if (sizeResult.isErr()) {
+			return sizeResult.mapErr<u8[]>();
+		}
+		const size = u32(sizeResult.ok());
 		const remaining = this._end - this._index;
 		if (size > u64(remaining)) {
-			abort('Invalid byte size');
+			return types.Result.err<u8[]>('Invalid byte size');
 		}
 		const result = this._data.slice(this._index, this._index + size);
 		this._index += size;
 
-		return result;
+		return types.Result.ok(result);
 	}
 
-	private _readString(): string {
-		const rawBytes = this._readBytes();
+	private _readString(): types.Result<string> {
+		const rawBytesResult = this._readBytes();
+		if (rawBytesResult.isErr()) {
+			return rawBytesResult.mapErr<string>();
+		}
+		const rawBytes = rawBytesResult.ok();
 		const typedBytes = new Uint8Array(rawBytes.length);
 		typedBytes.set(rawBytes);
 
-		return String.UTF8.decode(typedBytes.buffer, false);
+		return types.Result.ok(String.UTF8.decode(typedBytes.buffer, false));
 	}
 }

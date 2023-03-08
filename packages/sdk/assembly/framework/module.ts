@@ -1,3 +1,4 @@
+import * as types from '../type_def';
 export class CommandContext {
 	senderAddress: u8[] = [];
 }
@@ -37,7 +38,7 @@ export class Module {
 		return TransactionExecuteResult.INVALID;
 	}
 	// view should be extended by compiler taking the 'view' decorator
-	public view(_method: string, _params: u8[]): u8[] {
-		return [];
+	public view(_method: string, _params: u8[]): types.Result<u8[]> {
+		return types.Result.err<u8[]>('method not implemented');
 	}
 }

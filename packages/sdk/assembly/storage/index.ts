@@ -1,6 +1,8 @@
 import * as env from "../env";
 import { pointer } from "../internal";
 import { EncodeDecoder } from '../encoding';
+import * as types from '../type_def';
+import * as dev from '../dev';
 
 export class BaseStore<T extends EncodeDecoder> {
     _name: string = "";
@@ -34,7 +36,10 @@ export class BaseStore<T extends EncodeDecoder> {
         if (valSize == 0) {
             return i;
         }
-		i.decode(value);
+		const decodeResult = i.decode(value);
+        if (decodeResult.isErr()) {
+            dev.abort('Invalid value obtained for decoding');
+        }
         return i;
     }
 

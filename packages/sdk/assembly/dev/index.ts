@@ -10,3 +10,8 @@ export function log(text: string): void {
 
     env.dev.log(ptrSize);
 }
+
+export function abort(reason: string): void {
+    log(reason);
+    unreachable();
+}
