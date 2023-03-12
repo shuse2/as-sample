@@ -7,16 +7,17 @@
   "type": "module",
   "types": "assembly/index.ts",
   "scripts": {
-    "test": "node tests",
+    "test": "asp --verbose",
     "build": "tsc"
   },
-	"exports": {
-		"./transform": "./dist/transforms/module_transformer.js",
-		"./export": "./dist/transforms/export_transformer.js"
-	},
+  "exports": {
+    "./transform": "./dist/transforms/module_transformer.js",
+    "./export": "./dist/transforms/export_transformer.js"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@as-pect/cli": "^8.0.1",
     "@types/node": "^18.11.18",
     "assemblyscript": "^0.25.0",
     "typescript": "^4.9.4"

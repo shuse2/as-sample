@@ -10,6 +10,21 @@ export function equal(v1: Uint8Array, v2: Uint8Array): bool {
     return true;
 }
 
+export function compare(v1: Uint8Array, v2: Uint8Array): i32 {
+    if (v1.length !== v2.length) {
+        unreachable();
+    }
+    for (let i = 0; i < v1.length; i++) {
+        if (v1[i] > v2[i]) {
+            return 1;
+        }
+        if (v1[i] < v2[i]) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
 export function sort(values: Uint8Array[]): void {
     values.sort((a, b) => a.length - b.length );
 }
