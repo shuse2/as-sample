@@ -17,7 +17,10 @@ export default {
   async instantiate(memory, createImports, instantiate, binary) {
     let instance; // Imports can reference this
     const myImports = {
-      env: { memory }
+      env: {
+        memory,
+        'dev.log': () => {},
+      },
       // put your web assembly imports here, and return the module promise
     };
     instance = instantiate(binary, createImports(myImports));
